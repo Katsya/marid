@@ -29,7 +29,7 @@ import com.vaadin.flow.router.NavigationEvent;
 import com.vaadin.flow.server.*;
 import org.marid.app.common.UIContexts;
 import org.marid.spring.annotation.MaridComponent;
-import org.marid.ui.webide.base.views.MainView;
+import org.marid.ui.webide.base.views.main.MainView;
 import org.springframework.context.support.GenericApplicationContext;
 
 import java.util.Optional;

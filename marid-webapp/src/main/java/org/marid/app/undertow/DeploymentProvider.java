@@ -20,7 +20,6 @@
  */
 package org.marid.app.undertow;
 
-import io.undertow.server.handlers.resource.ClassPathResourceManager;
 import io.undertow.server.session.SslSessionConfig;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.FilterInfo;
@@ -46,9 +45,8 @@ public class DeploymentProvider {
       .setDefaultSessionTimeout(3600);
 
   @Autowired
-  public void setResourseManager() {
-    final var classLoader = deploymentInfo.getClassLoader();
-    deploymentInfo.setResourceManager(new ClassPathResourceManager(classLoader, "META-INF/resources/"));
+  public void setResourseManager(MaridResourceManager resourseManager) {
+    deploymentInfo.setResourceManager(resourseManager);
   }
 
   @Autowired

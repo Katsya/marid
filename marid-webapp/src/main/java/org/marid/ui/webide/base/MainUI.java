@@ -24,6 +24,7 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.page.Viewport;
+import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinServletService;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.communication.PushMode;
@@ -41,6 +42,11 @@ import org.springframework.stereotype.Component;
 @Component
 @ComponentScan
 public class MainUI extends UI {
+
+  @Override
+  protected void init(VaadinRequest request) {
+    super.init(request);
+  }
 
   @Override
   protected void onAttach(AttachEvent attachEvent) {

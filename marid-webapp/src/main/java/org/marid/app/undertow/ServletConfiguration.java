@@ -44,7 +44,7 @@ public class ServletConfiguration {
     info.setAsyncSupported(true);
     info.setLoadOnStartup(4);
     info.setEnabled(true);
-    info.addMappings("/app/*");
+    info.addMappings("/app/*", "/VAADIN/*");
     info.addInitParam(SERVLET_PARAMETER_PRODUCTION_MODE, Boolean.toString(production));
     info.addInitParam(UI_PARAMETER, MainUI.class.getName());
     return info;

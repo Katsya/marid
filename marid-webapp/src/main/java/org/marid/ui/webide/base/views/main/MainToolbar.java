@@ -18,22 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package org.marid.ui.webide.base.views;
+package org.marid.ui.webide.base.views.main;
 
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouterLayout;
-import org.marid.spring.annotation.SpringComponent;
-import org.springframework.context.annotation.Lazy;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import org.springframework.stereotype.Component;
 
-@Route
-@SpringComponent
-@Lazy
-public class MainView extends VerticalLayout implements RouterLayout {
-
-  public MainView() {
-    setSizeFull();
-    add(new Button("xxx"));
-  }
+@Component
+public class MainToolbar extends HorizontalLayout {
 }
