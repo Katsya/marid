@@ -20,9 +20,9 @@
  */
 package org.marid.applib.utils;
 
-import com.vaadin.data.ValueContext;
-import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.Component;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.data.binder.ValueContext;
+import com.vaadin.flow.server.VaadinSession;
 import org.jetbrains.annotations.PropertyKey;
 import org.marid.l10n.L10n;
 
@@ -33,7 +33,7 @@ public interface Locales {
 
   static String m(ValueContext ctx, @PropertyKey(resourceBundle = "res.messages") String key, Object... args) {
     final var locale = ctx.getLocale()
-        .or(() -> ctx.getComponent().map(Component::getLocale))
+        .or(() -> Optional.ofNullable(UI.getCurrent()).map(UI::getLocale))
         .or(() -> Optional.ofNullable(VaadinSession.getCurrent()).map(VaadinSession::getLocale))
         .orElseGet(Locale::getDefault);
     return L10n.m(locale, key, args);

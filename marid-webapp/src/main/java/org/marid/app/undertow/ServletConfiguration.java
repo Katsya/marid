@@ -20,7 +20,6 @@
  */
 package org.marid.app.undertow;
 
-import com.vaadin.server.VaadinServlet;
 import io.undertow.servlet.api.FilterInfo;
 import io.undertow.servlet.api.ServletInfo;
 import io.undertow.servlet.util.ImmediateInstanceFactory;
@@ -33,15 +32,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import static com.vaadin.server.Constants.SERVLET_PARAMETER_PRODUCTION_MODE;
-import static com.vaadin.server.VaadinSession.UI_PARAMETER;
+import static com.vaadin.flow.server.Constants.SERVLET_PARAMETER_PRODUCTION_MODE;
+import static com.vaadin.flow.server.VaadinSession.UI_PARAMETER;
 
 @Component
 public class ServletConfiguration {
 
   @Bean
   public ServletInfo vaadinServletInfo(MaridServlet servlet, @Value("${vaadin.production:true}") boolean production) {
-    final var info = new ServletInfo("vaadinServlet", VaadinServlet.class, new ImmediateInstanceFactory<>(servlet));
+    final var info = new ServletInfo("vaadinServlet", MaridServlet.class, new ImmediateInstanceFactory<>(servlet));
     info.setAsyncSupported(true);
     info.setLoadOnStartup(4);
     info.setEnabled(true);

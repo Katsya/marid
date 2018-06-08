@@ -18,21 +18,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package org.marid.applib.utils;
+package org.marid.app.common;
 
-import com.vaadin.ui.CustomLayout;
+import com.vaadin.flow.i18n.I18NProvider;
+import org.marid.l10n.L10n;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.util.List;
+import java.util.Locale;
 
-public interface Layouts {
+@Component
+public class InternationalizationProvider implements I18NProvider {
 
-  static CustomLayout customLayout(String location) {
-    final var classLoader = Thread.currentThread().getContextClassLoader();
-    try {
-      return new CustomLayout(classLoader.getResourceAsStream(location));
-    } catch (IOException x) {
-      throw new UncheckedIOException(x);
-    }
+  @Override
+  public List<Locale> getProvidedLocales() {
+    return List.of(Locale.US);
+  }
+
+  @Override
+  public String getTranslation(String key, Locale locale, Object... params) {
+    return L10n.s(locale, key, params);
   }
 }

@@ -20,7 +20,7 @@
  */
 package org.marid.ui.webide.base.views.projects;
 
-import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import org.marid.ui.webide.base.dao.ProjectDao;
 import org.springframework.stereotype.Component;
 

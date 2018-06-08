@@ -18,27 +18,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package org.marid.app.undertow;
+package org.marid.ui.webide.base.views;
 
-import io.undertow.server.handlers.resource.ClassPathResourceManager;
-import io.undertow.server.handlers.resource.Resource;
-import org.springframework.stereotype.Component;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
+import org.marid.spring.annotation.SpringComponent;
+import org.springframework.context.annotation.Lazy;
 
-import java.io.IOException;
+@Route
+@SpringComponent
+@Lazy
+public class MainView extends VerticalLayout implements RouterLayout {
 
-@Component
-public class MaridResourceManager extends ClassPathResourceManager {
-
-  public MaridResourceManager() {
-    super(Thread.currentThread().getContextClassLoader());
-  }
-
-  @Override
-  public Resource getResource(String path) throws IOException {
-    if (path.startsWith("/public/") || path.startsWith("/VAADIN/")) {
-      return super.getResource(path);
-    } else {
-      return null;
-    }
+  public MainView() {
+    setSizeFull();
+    add(new Button("xxx"));
   }
 }

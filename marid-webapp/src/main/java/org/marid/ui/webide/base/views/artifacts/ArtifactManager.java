@@ -20,7 +20,7 @@
  */
 package org.marid.ui.webide.base.views.artifacts;
 
-import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import org.marid.applib.repository.Artifact;
 import org.marid.ui.webide.base.dao.ArtifactDao;
 import org.springframework.stereotype.Component;

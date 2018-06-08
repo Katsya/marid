@@ -20,53 +20,32 @@
  */
 package org.marid.ui.webide.base;
 
-import com.vaadin.annotations.PreserveOnRefresh;
-import com.vaadin.annotations.Push;
-import com.vaadin.annotations.Theme;
-import com.vaadin.annotations.Viewport;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinServletService;
-import com.vaadin.server.VaadinSession;
-import com.vaadin.shared.communication.PushMode;
-import com.vaadin.shared.ui.ui.Transport;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.page.Push;
+import com.vaadin.flow.component.page.Viewport;
+import com.vaadin.flow.server.VaadinServletService;
+import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.shared.communication.PushMode;
+import com.vaadin.flow.shared.ui.Transport;
+import org.marid.app.common.UIContexts;
 import org.marid.app.web.MaridServlet;
 import org.marid.applib.spring.ContextUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
-@PreserveOnRefresh
 @Viewport("width=device-width, initial-scale=1")
-@Theme("marid")
 @Component
 @ComponentScan
 public class MainUI extends UI {
 
   @Override
-  protected void init(VaadinRequest request) {
-    getPage().setTitle("Menu");
-    setSizeFull();
-  }
-
-  @Autowired
-  private void init(MainMenuBar mainMenuBar, MainTabs tabs) {
-    final var layout = new VerticalLayout(mainMenuBar, tabs);
-    layout.setMargin(false);
-    layout.setSpacing(true);
-    layout.setExpandRatio(tabs, 1);
-    layout.setSizeFull();
-
-    setContent(layout);
-  }
-
-  @Override
-  public void attach() {
+  protected void onAttach(AttachEvent attachEvent) {
     final var parent = getContext();
+    final var uiContexts = parent.getBean(UIContexts.class);
     final var child = ContextUtils.context(parent, c -> {
       c.setId("mainUI");
       c.setDisplayName("mainUI");
@@ -75,9 +54,8 @@ public class MainUI extends UI {
       final var closeListener = ContextUtils.closeListener(c, event -> registration.remove());
       c.addApplicationListener(closeListener);
     });
-
-    super.attach();
-
+    uiContexts.register(this, child);
+    super.onAttach(attachEvent);
     child.refresh();
     child.start();
   }

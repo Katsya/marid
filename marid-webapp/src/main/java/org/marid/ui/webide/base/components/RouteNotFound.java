@@ -18,17 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package org.marid.ui.webide.base.views.projects;
+package org.marid.ui.webide.base.components;
 
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.flow.router.RouteNotFoundError;
+import org.marid.spring.annotation.PrototypeScoped;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProjectsPanel extends VerticalLayout {
-
-  public ProjectsPanel(ProjectToolbar toolbar, ProjectList view) {
-    setSizeFull();
-    addComponent(toolbar);
-    addComponentsAndExpand(view);
-  }
+@PrototypeScoped
+public class RouteNotFound extends RouteNotFoundError {
 }

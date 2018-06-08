@@ -20,22 +20,72 @@
 
     <dependency>
       <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-server</artifactId>
+      <artifactId>vaadin</artifactId>
     </dependency>
 
     <dependency>
       <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-client-compiled</artifactId>
+      <artifactId>vaadin-spring</artifactId>
     </dependency>
 
     <dependency>
       <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-push</artifactId>
+      <artifactId>flow-data</artifactId>
     </dependency>
 
     <dependency>
       <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-themes</artifactId>
+      <artifactId>flow-push</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-dialog-flow</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-grid-flow</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-text-field-flow</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-notification-flow</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-tabs-flow</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-lumo-theme</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-icons-flow</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-form-layout-flow</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-ordered-layout-flow</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-checkbox-flow</artifactId>
     </dependency>
 
     <dependency>
@@ -101,7 +151,7 @@
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-bom</artifactId>
         <type>pom</type>
-        <version>8.4.3</version>
+        <version>10.0.0.rc1</version>
         <scope>import</scope>
       </dependency>
     </dependencies>
@@ -204,26 +254,13 @@
           <displayCommandOutputs>true</displayCommandOutputs>
         </configuration>
       </plugin>
-
-      <plugin>
-        <groupId>com.vaadin</groupId>
-        <artifactId>vaadin-maven-plugin</artifactId>
-        <version>8.4.3</version>
-        <executions>
-          <execution>
-            <id>vaadin</id>
-            <goals>
-              <goal>update-theme</goal>
-              <goal>compile-theme</goal>
-            </goals>
-            <phase>none</phase>
-            <configuration>
-              <theme>marid</theme>
-              <warSourceDirectory>src/main/binary-resources</warSourceDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
+
+  <repositories>
+    <repository>
+      <id>vaadin-prereleases</id>
+      <url>https://maven.vaadin.com/vaadin-prereleases</url>
+    </repository>
+  </repositories>
 </project>

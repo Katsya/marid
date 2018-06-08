@@ -20,7 +20,7 @@
  */
 package org.marid.ui.webide.base.views.repositories;
 
-import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import org.marid.applib.repository.Repository;
 import org.marid.ui.webide.base.dao.RepositoryDao;
 import org.marid.ui.webide.base.model.RepositoryItem;

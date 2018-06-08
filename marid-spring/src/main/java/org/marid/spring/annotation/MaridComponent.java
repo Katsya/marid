@@ -1,6 +1,6 @@
 /*-
  * #%L
- * marid-webapp
+ * marid-spring
  * %%
  * Copyright (C) 2012 - 2018 MARID software development group
  * %%
@@ -18,28 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package org.marid.applib.components;
+package org.marid.spring.annotation;
 
-import com.vaadin.ui.Component;
-import com.vaadin.ui.VerticalLayout;
+import org.springframework.core.annotation.AliasFor;
+import org.springframework.stereotype.Component;
 
-public class ToolbarForm<T extends Toolbar, C extends Component> extends VerticalLayout {
+import java.lang.annotation.*;
 
-  private final T toolbar;
-  private final C component;
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Component
+public @interface MaridComponent {
 
-  public ToolbarForm(T toolbar, C component) {
-    setSpacing(true);
-    setMargin(true);
-    addComponent(this.toolbar = toolbar);
-    addComponentsAndExpand(this.component = component);
-  }
-
-  public T getToolbar() {
-    return toolbar;
-  }
-
-  public C getComponent() {
-    return component;
-  }
+  @AliasFor(annotation = Component.class, attribute = "value")
+  String value() default "";
 }

@@ -20,16 +20,16 @@
  */
 package org.marid.ui.webide.base;
 
-import com.vaadin.server.VaadinSession;
+import com.vaadin.flow.server.VaadinSession;
+import org.marid.spring.annotation.MaridComponent;
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.profile.CommonProfile;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashMap;
 import java.util.Locale;
 
-@Component
+@MaridComponent
 public class UIConfiguration {
 
   @Bean

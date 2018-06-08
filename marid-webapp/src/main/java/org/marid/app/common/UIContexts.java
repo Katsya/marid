@@ -18,22 +18,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package org.marid.app.web;
+package org.marid.app.common;
 
-import com.vaadin.server.BootstrapFragmentResponse;
-import com.vaadin.server.BootstrapListener;
-import com.vaadin.server.BootstrapPageResponse;
+import com.vaadin.flow.component.UI;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
 
-@Component
-public class MainServletBootstrapListener implements BootstrapListener {
-  @Override
-  public void modifyBootstrapFragment(BootstrapFragmentResponse response) {
+import java.util.WeakHashMap;
 
+@Component
+public class UIContexts {
+
+  private final WeakHashMap<UI, AnnotationConfigApplicationContext> contexts = new WeakHashMap<>();
+
+  public void register(UI ui, AnnotationConfigApplicationContext context) {
+    synchronized (contexts) {
+      contexts.put(ui, context);
+    }
   }
 
-  @Override
-  public void modifyBootstrapPage(BootstrapPageResponse response) {
-    response.getDocument().head().getElementsByAttributeValue("rel", "icon").attr("href", "/public/marid32.png");
+  public AnnotationConfigApplicationContext getContextFor(UI ui) {
+    synchronized (contexts) {
+      return contexts.get(ui);
+    }
   }
 }

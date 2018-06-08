@@ -20,12 +20,13 @@
  */
 package org.marid.applib.validators;
 
-import com.vaadin.data.Validator;
+
+import com.vaadin.flow.data.binder.Validator;
 
 import java.io.File;
 
-import static com.vaadin.data.ValidationResult.error;
-import static com.vaadin.data.ValidationResult.ok;
+import static com.vaadin.flow.data.binder.ValidationResult.error;
+import static com.vaadin.flow.data.binder.ValidationResult.ok;
 import static org.marid.applib.utils.Locales.m;
 
 public interface StringValidators {
