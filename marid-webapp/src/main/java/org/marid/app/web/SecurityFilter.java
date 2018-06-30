@@ -4,18 +4,11 @@
  * %%
  * Copyright (C) 2012 - 2018 MARID software development group
  * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v. 1.0 which accompanies this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ * http://www.eclipse.org/org/documents/edl-v10.php.
  * #L%
  */
 package org.marid.app.web;
@@ -30,9 +23,7 @@ import org.pac4j.core.engine.decision.AlwaysUseSessionProfileStorageDecision;
 import org.pac4j.core.exception.HttpAction;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpFilter;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -40,7 +31,7 @@ import java.util.List;
 
 @Component
 @PrototypeScoped
-public class SecurityFilter extends HttpFilter {
+public class SecurityFilter implements Filter {
 
   private final Config config;
   private final DefaultSecurityLogic<Boolean, J2EContext> logic = new DefaultSecurityLogic<>() {
@@ -57,11 +48,11 @@ public class SecurityFilter extends HttpFilter {
   }
 
   @Override
-  protected void doFilter(HttpServletRequest q, HttpServletResponse r, FilterChain c) throws IOException, ServletException {
-    final var context = new J2EContext(q, r);
+  public void doFilter(ServletRequest q, ServletResponse r, FilterChain c) throws IOException, ServletException {
+    final var context = new J2EContext((HttpServletRequest) q, (HttpServletResponse) r);
     final var result = logic.perform(context, config, authorize, (code, ctx) -> false, null, "user", null, false);
     if (result) {
-      super.doFilter(q, r, c);
+      c.doFilter(q, r);
     }
   }
 }

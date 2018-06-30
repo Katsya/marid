@@ -31,6 +31,8 @@ import java.util.Scanner;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public interface MaridIterators {
 
@@ -47,6 +49,10 @@ public interface MaridIterators {
         return next.get();
       }
     };
+  }
+
+  static <E> Stream<E> stream(@NotNull Iterable<E> iterable) {
+    return StreamSupport.stream(iterable.spliterator(), false);
   }
 
   @NotNull

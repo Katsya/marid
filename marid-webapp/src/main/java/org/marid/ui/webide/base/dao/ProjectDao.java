@@ -4,38 +4,38 @@
  * %%
  * Copyright (C) 2012 - 2018 MARID software development group
  * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v. 1.0 which accompanies this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ * http://www.eclipse.org/org/documents/edl-v10.php.
  * #L%
  */
 package org.marid.ui.webide.base.dao;
 
+import org.marid.applib.dao.ListDao;
+import org.marid.applib.model.ProjectItem;
+import org.marid.io.MaridFiles;
 import org.marid.ui.webide.base.UserDirectories;
 import org.springframework.stereotype.Component;
-import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
-import static java.nio.file.Files.walk;
+import static java.util.logging.Level.WARNING;
+import static java.util.stream.Collectors.toUnmodifiableList;
+import static java.util.stream.Collectors.toUnmodifiableSet;
+import static java.util.stream.StreamSupport.stream;
+import static org.marid.logging.Log.log;
 
 @Component
-public class ProjectDao {
+public class ProjectDao implements ListDao<String, ProjectItem> {
 
   private final Path directory;
 
@@ -43,13 +43,35 @@ public class ProjectDao {
     this.directory = userDirectories.getProjectsDirectory();
   }
 
-  public List<String> getProjectNames() {
-    try {
-      return Files.list(directory)
-          .filter(Files::isDirectory)
-          .map(Path::getFileName)
-          .map(Path::toString)
-          .collect(Collectors.toUnmodifiableList());
+  private String name(Path file) {
+    return file.getFileName().toString();
+  }
+
+  @Override
+  public void save(Collection<? extends ProjectItem> data) {
+    try (final var files = Files.newDirectoryStream(directory, Files::isDirectory)) {
+      for (final var file : files) {
+        final var name = name(file);
+        if (data.stream().map(ProjectItem::getId).noneMatch(name::equals)) {
+          MaridFiles.delete(file);
+        }
+      }
+    } catch (IOException x) {
+      throw new UncheckedIOException(x);
+    }
+    for (final var item : data) {
+      try {
+        Files.createDirectories(directory.resolve(item.getId()));
+      } catch (IOException x) {
+        log(WARNING, "Unable to create {0}", x, item);
+      }
+    }
+  }
+
+  @Override
+  public List<ProjectItem> load() {
+    try (final var files = Files.newDirectoryStream(directory, Files::isDirectory)) {
+      return stream(files.spliterator(), false).map(e -> new ProjectItem(name(e))).collect(toUnmodifiableList());
     } catch (NoSuchFileException x) {
       return List.of();
     } catch (IOException x) {
@@ -57,52 +79,18 @@ public class ProjectDao {
     }
   }
 
-  public long getSize(String projectName) {
-    try {
-      return walk(directory.resolve(projectName))
-          .filter(Files::isRegularFile)
-          .mapToLong(f -> {
-            try {
-              return Files.size(f);
-            } catch (NoSuchFileException x) {
-              return 0L;
-            } catch (IOException x) {
-              throw new UncheckedIOException(x);
-            }
-          })
-          .sum();
+  @Override
+  public Set<String> getIds() {
+    try (final var files = Files.newDirectoryStream(directory, Files::isDirectory)) {
+      return stream(files.spliterator(), false).map(this::name).collect(toUnmodifiableSet());
     } catch (NoSuchFileException x) {
-      return 0L;
+      return Set.of();
     } catch (IOException x) {
       throw new UncheckedIOException(x);
     }
   }
 
-  public boolean exists(String projectName) {
-    final Path path = directory.resolve(projectName);
-    return Files.isDirectory(path);
-  }
-
-  public void tryCreate(String projectName) {
-    try {
-      final Path path = directory.resolve(projectName);
-      Files.createDirectories(path);
-    } catch (IOException x) {
-      throw new UncheckedIOException(x);
-    }
-  }
-
-  public boolean removeProject(String project) {
-    try {
-      final Path path = directory.resolve(project);
-      if (Files.isDirectory(path)) {
-        FileSystemUtils.deleteRecursively(path);
-        return true;
-      } else {
-        return false;
-      }
-    } catch (IOException x) {
-      throw new UncheckedIOException(x);
-    }
+  public long getSize(String id) {
+    return MaridFiles.size(directory.resolve(id));
   }
 }

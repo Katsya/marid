@@ -4,49 +4,45 @@
  * %%
  * Copyright (C) 2012 - 2018 MARID software development group
  * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v. 1.0 which accompanies this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ * http://www.eclipse.org/org/documents/edl-v10.php.
  * #L%
  */
 package org.marid.ui.webide.base.dao;
 
+import org.marid.applib.dao.ListDao;
 import org.marid.applib.repository.Artifact;
 import org.marid.ui.webide.base.UserDirectories;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.marid.applib.json.MaridJackson.MAPPER;
 
 @Component
-public class ArtifactDao {
+public class ArtifactDao implements ListDao<Artifact, Artifact> {
 
-  private final Path directory;
+  private final Path file;
 
   public ArtifactDao(UserDirectories userDirectories) {
-    this.directory = userDirectories.getRepositoriesDirectory();
+    this.file = userDirectories.getRepositoriesDirectory().resolve("artifacts.list");
   }
 
-  public List<Artifact> loadArtifacts() {
-    final Path artifacts = directory.resolve("artifacts.list");
-    try (final var reader = Files.newBufferedReader(artifacts, UTF_8)) {
+  @Override
+  public List<Artifact> load() {
+    try (final var reader = Files.newBufferedReader(file, UTF_8)) {
       final var parser = MAPPER.getFactory().createParser(reader);
       return MAPPER.readValues(parser, Artifact.class).readAll();
     } catch (NoSuchFileException x) {
@@ -56,10 +52,15 @@ public class ArtifactDao {
     }
   }
 
-  public void save(Iterable<Artifact> artifacts) {
-    final Path file = directory.resolve("artifacts.list");
-    try (final Writer writer = Files.newBufferedWriter(file, UTF_8)) {
-      MAPPER.writerFor(Artifact.class).writeValues(writer).writeAll(artifacts);
+  @Override
+  public Set<Artifact> getIds() {
+    return load().stream().collect(Collectors.toUnmodifiableSet());
+  }
+
+  @Override
+  public void save(Collection<? extends Artifact> data) {
+    try (final var writer = Files.newBufferedWriter(file, UTF_8)) {
+      MAPPER.writerFor(Artifact.class).writeValues(writer).writeAll(data);
     } catch (IOException x) {
       throw new UncheckedIOException(x);
     }

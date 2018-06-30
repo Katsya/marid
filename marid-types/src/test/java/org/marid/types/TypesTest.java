@@ -21,10 +21,12 @@
 
 package org.marid.types;
 
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.marid.types.AuxTypeUtils.*;
 import org.marid.types.util.MappedVars;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import java.io.Serializable;
 import java.io.Writer;
@@ -36,48 +38,52 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.marid.test.TestGroups.NORMAL;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.marid.types.AuxTypeUtils.*;
 import static org.marid.types.Classes.classes;
-import static org.testng.Assert.assertEquals;
 
-public class TypesTest {
+@Tag("normal")
+class TypesTest {
 
-  @Test(groups = {NORMAL})
-  public void resolveVars1() {
+  @Test
+  void resolveVars1() {
     final MappedVars map = Types.resolveVars(AuxTypeUtils.List2.class);
 
     final Set<Class<?>> ec = classes(AuxTypeUtils.List2.class).filter(c -> c.getTypeParameters().length > 0).collect(toSet());
     final Set<Class<?>> ac = map.vars().map(v -> (Class<?>) v.getGenericDeclaration()).collect(toSet());
     final Set<TypeVariable<?>> expectedVars = ec.stream().flatMap(c -> Stream.of(c.getTypeParameters())).collect(toSet());
 
-    assertEquals(ac, ec);
-    assertEquals(map.vars().collect(toSet()), expectedVars);
-    assertEquals(map.types().collect(toSet()), Set.of(Writer.class));
+    assertEquals(ec, ac);
+    assertEquals(expectedVars, map.vars().collect(toSet()));
+    assertEquals(Set.of(Writer.class), map.types().collect(toSet()));
   }
 
-  @Test(groups = {NORMAL})
-  public void resolveVars2() {
+  @Test
+  void resolveVars2() {
     final MappedVars map = Types.resolveVars(AuxTypeUtils.List2.M.class);
 
     final Set<Class<?>> ec = classes(AuxTypeUtils.List1.M.class).filter(c -> c.getTypeParameters().length > 0).collect(toSet());
     final Set<Class<?>> ac = map.vars().map(v -> (Class<?>) v.getGenericDeclaration()).collect(toSet());
     final Set<TypeVariable<?>> expectedVars = ec.stream().flatMap(c -> Stream.of(c.getTypeParameters())).collect(toSet());
 
-    assertEquals(ac, ec);
-    assertEquals(map.vars().collect(toSet()), expectedVars);
+    assertEquals(ec, ac);
+    assertEquals(expectedVars, map.vars().collect(toSet()));
   }
 
   @Test
-  public void resolveVarsStackOverflow() {
+  void resolveVarsStackOverflow() {
     final MappedVars map = Types.resolveVars(AuxTypeUtils.Map2.class);
 
-    assertEquals(Set.of(Map1.class.getTypeParameters()), map.vars().collect(toSet()));
-    assertEquals(Set.of(p(I1.class, I1.class)), map.types().collect(toSet()));
+    final var expectedVar = Map1.class.getTypeParameters()[0];
+    final var actualVar = map.vars().findFirst().orElseThrow();
+    assertEquals(expectedVar, actualVar);
+
+    final var expectedType = new MaridParameterizedType(AuxTypeUtils.class, I1.class, I1.class);
+    final var actualType = map.types().findFirst().orElseThrow();
+    assertEquals(expectedType, actualType);
   }
 
-  @DataProvider
-  public static Object[][] typesData() {
+  private static Object[][] typesData() {
     return new Object[][]{
         {p(ArrayList.class, Integer.class), Arrays.asList(
             p(ArrayList.class, Integer.class),
@@ -128,14 +134,14 @@ public class TypesTest {
     };
   }
 
-  @Test(groups = {NORMAL}, dataProvider = "typesData")
-  public void types(Type type, List<Type> expected) {
+  @ParameterizedTest
+  @MethodSource("typesData")
+  void types(Type type, List<Type> expected) {
     final List<Type> actual = Types.typesTree(type).collect(toList());
-    assertEquals(actual, expected);
+    assertEquals(expected, actual);
   }
 
-  @DataProvider
-  public static Object[][] assignmentsData() {
+  private static Object[][] assignmentsData() {
     return new Object[][]{
         {Object.class, int.class, true},
         {long.class, int.class, false},
@@ -148,9 +154,10 @@ public class TypesTest {
     };
   }
 
-  @Test
-  public void assignments(Type to, Type from, boolean expected) {
+  @ParameterizedTest
+  @MethodSource("assignmentsData")
+  void assignments(Type to, Type from, boolean expected) {
     final boolean actual = Types.isAssignable(to, from);
-    assertEquals(actual, expected);
+    assertEquals(expected, actual);
   }
 }

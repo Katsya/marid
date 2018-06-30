@@ -26,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import org.marid.cellar.runtime.RuntimeBottle;
 import org.marid.cellar.runtime.RuntimeRack;
 import org.marid.collections.MaridIterators;
-import org.marid.collections.MaridMaps;
 import org.marid.runtime.exception.BottleDestructionException;
 import org.marid.runtime.exception.BottleInitializationException;
 import org.marid.runtime.exception.RackContextCloseException;
@@ -89,7 +88,7 @@ public final class RackContext implements AutoCloseable {
       }
     }
 
-    this.destroyerMap = MaridMaps.immutable(destroyerMap);
+    this.destroyerMap = Map.copyOf(destroyerMap);
   }
 
   @Nullable

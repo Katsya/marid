@@ -21,20 +21,21 @@
 
 package org.marid.xml;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
 
-import static org.marid.test.TestGroups.NORMAL;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HtmlBuilderTest {
+@Tag("normal")
+class HtmlBuilderTest {
 
-  @Test(groups = {NORMAL})
-  public void testSimple() throws IOException {
+  @Test
+  void testSimple() throws IOException {
     final StringWriter writer = new StringWriter();
 
     new HtmlBuilder()
@@ -43,7 +44,6 @@ public class HtmlBuilderTest {
         .write(new StreamResult(writer));
 
     assertEquals(
-        writer.toString().replaceAll("\\r\\n|\\r", "\n").trim(),
         "<!DOCTYPE html SYSTEM \"about:legacy-compat\">\n" +
             "<html>\n" +
             "  <head>\n" +
@@ -53,6 +53,7 @@ public class HtmlBuilderTest {
             "  <body>\n" +
             "    <details></details>\n" +
             "  </body>\n" +
-            "</html>");
+            "</html>",
+        writer.toString().replaceAll("\\r\\n|\\r", "\n").trim());
   }
 }

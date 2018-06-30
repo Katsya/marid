@@ -30,7 +30,7 @@ import java.util.function.Supplier;
  */
 public class Builder<T> {
 
-  final T builder;
+  private final T builder;
 
   public Builder(T builder) {
     this.builder = builder;
@@ -47,6 +47,14 @@ public class Builder<T> {
 
   public static <T> T build(T arg, Consumer<T> consumer) {
     consumer.accept(arg);
+    return arg;
+  }
+
+  @SafeVarargs
+  public static <T> T build(T arg, Consumer<T>... consumers) {
+    for (final var consumer : consumers) {
+      consumer.accept(arg);
+    }
     return arg;
   }
 

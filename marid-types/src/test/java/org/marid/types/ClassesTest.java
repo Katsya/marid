@@ -21,21 +21,21 @@
 
 package org.marid.types;
 
-import org.marid.test.TestGroups;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.Serializable;
 import java.util.*;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ClassesTest {
+@Tag("normal")
+class ClassesTest {
 
-  @DataProvider
-  public static Object[][] classesTestData() {
+  private static Object[][] classesTestData() {
     return new Object[][]{
         {
             ArrayList.class,
@@ -54,10 +54,11 @@ public class ClassesTest {
     };
   }
 
-  @Test(groups = {TestGroups.NORMAL}, dataProvider = "classesTestData")
-  public void testClasses(Class<?> target, List<Class<?>> expected) {
+  @ParameterizedTest
+  @MethodSource("classesTestData")
+  void testClasses(Class<?> target, List<Class<?>> expected) {
     final List<Class<?>> actual = Classes.classes(target).collect(toList());
 
-    assertEquals(actual, expected);
+    assertEquals(expected, actual);
   }
 }

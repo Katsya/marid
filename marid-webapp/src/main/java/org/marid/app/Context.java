@@ -4,26 +4,19 @@
  * %%
  * Copyright (C) 2012 - 2018 MARID software development group
  * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v. 1.0 which accompanies this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ * http://www.eclipse.org/org/documents/edl-v10.php.
  * #L%
  */
 
 package org.marid.app;
 
-import org.marid.spring.annotation.PrototypeScoped;
-import org.marid.applib.spring.LoggingPostProcessor;
 import org.marid.logging.MaridLogManager;
+import org.marid.spring.LoggingPostProcessor;
+import org.marid.spring.annotation.PrototypeScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InjectionPoint;
@@ -31,19 +24,14 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.SimpleCommandLinePropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.InputStream;
 import java.lang.ref.Cleaner;
-import java.nio.file.Files;
-import java.util.List;
-import java.util.Scanner;
 import java.util.logging.LogManager;
 
 @EnableScheduling
@@ -79,25 +67,6 @@ public class Context {
     return Cleaner.create();
   }
 
-  @Bean(initMethod = "start")
-  public static Thread quitter(GenericApplicationContext context) {
-    final Thread thread = new Thread(null, () -> {
-      try (final Scanner scanner = new Scanner(System.in)) {
-        while (scanner.hasNextLine()) {
-          switch (scanner.nextLine().trim()) {
-            case "q":
-            case "quit":
-              context.close();
-              System.exit(0);
-              break;
-          }
-        }
-      }
-    }, "quitter", 64L * 1024L, false);
-    thread.setDaemon(true);
-    return thread;
-  }
-
   public static void main(String... args) throws Exception {
     System.setProperty("java.util.logging.manager", MaridLogManager.class.getName());
 
@@ -105,9 +74,6 @@ public class Context {
     try (final InputStream inputStream = Context.class.getResourceAsStream("/app/logging.properties")) {
       logManager.readConfiguration(inputStream);
     }
-
-    final File pidFile = new File("marid-webapp.pid");
-    pidFile.deleteOnExit();
 
     final AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
 
@@ -122,7 +88,5 @@ public class Context {
     context.getEnvironment().getPropertySources().addFirst(new SimpleCommandLinePropertySource(args));
     context.refresh();
     context.start();
-
-    Files.write(pidFile.toPath(), List.of(Long.toString(ProcessHandle.current().pid())));
   }
 }

@@ -4,38 +4,32 @@
  * %%
  * Copyright (C) 2012 - 2018 MARID software development group
  * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v. 1.0 which accompanies this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ * http://www.eclipse.org/org/documents/edl-v10.php.
  * #L%
  */
 package org.marid.applib.repository;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Parameter;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toUnmodifiableList;
-import static org.marid.test.TestGroups.NORMAL;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ArtifactTest {
+@Tag("normal")
+class ArtifactTest {
 
-  @Test(groups = {NORMAL})
-  public void checkParameters() {
+  @Test
+  void checkParameters() {
     final var parameters = Artifact.class.getConstructors()[0].getParameters();
     final var names = Stream.of(parameters).map(Parameter::getName).collect(toUnmodifiableList());
 
-    Assert.assertTrue(names.contains("groupId"));
+    assertTrue(names.contains("groupId"));
   }
 }

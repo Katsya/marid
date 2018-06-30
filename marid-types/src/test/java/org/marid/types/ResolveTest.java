@@ -21,40 +21,42 @@
 
 package org.marid.types;
 
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.marid.types.AuxTypeUtils.C0;
 import org.marid.types.AuxTypeUtils.C1;
 import org.marid.types.AuxTypeUtils.C2;
 import org.marid.types.AuxTypeUtils.MyList;
 import org.marid.types.util.MappedVars;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.*;
 
-import static org.marid.test.TestGroups.NORMAL;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.marid.types.AuxTypeUtils.p;
 import static org.marid.types.Types.evaluate;
 import static org.marid.types.Types.getType;
-import static org.testng.Assert.assertEquals;
 
-public class ResolveTest {
+@Tag("normal")
+class ResolveTest {
 
-  @Test(groups = {NORMAL})
-  public void resolveMap() throws Exception {
+  @Test
+  void resolveMap() throws Exception {
     final Method method = Map.class.getMethod("put", Object.class, Object.class);
     final Type[] types = method.getGenericParameterTypes();
     final Type resolved = evaluate(e -> {
       e.bind(types[0], Long.class);
       e.bind(types[1], float.class);
     }, getType(Map.class));
-    assertEquals(resolved, p(Map.class, Long.class, Float.class));
+    assertEquals(p(Map.class, Long.class, Float.class), resolved);
   }
 
-  @Test(groups = {NORMAL})
-  public void resolveVars() {
+  @Test
+  void resolveVars() {
     final Type type = p(C2.class, Integer.class);
     final MappedVars map = Types.resolveVars(type);
 
@@ -62,13 +64,12 @@ public class ResolveTest {
     final TypeVariable<?> c1Var = C1.class.getTypeParameters()[0];
     final TypeVariable<?> c2Var = C2.class.getTypeParameters()[0];
 
-    assertEquals(map.get(c2Var), Integer.class);
-    assertEquals(map.get(c1Var), p(List.class, Integer.class));
-    assertEquals(map.get(c0Var), p(List.class, p(List.class, Integer.class)));
+    assertEquals(Integer.class, map.get(c2Var));
+    assertEquals(p(List.class, Integer.class), map.get(c1Var));
+    assertEquals(p(List.class, p(List.class, Integer.class)), map.get(c0Var));
   }
 
-  @DataProvider
-  public static Object[][] resolveLinkedHashMapData() throws Exception {
+  private static Object[][] resolveLinkedHashMapData() throws Exception {
     return new Object[][] {
         {Map.class.getMethod("put", Object.class, Object.class).getGenericParameterTypes()},
         {AbstractMap.class.getMethod("put", Object.class, Object.class).getGenericParameterTypes()},
@@ -76,17 +77,17 @@ public class ResolveTest {
     };
   }
 
-  @Test(groups = {NORMAL}, dataProvider = "resolveLinkedHashMapData")
-  public void resolveLinkedHashMap(Type[] types) {
+  @ParameterizedTest
+  @MethodSource("resolveLinkedHashMapData")
+  void resolveLinkedHashMap(Type[] types) {
     final Type resolved = evaluate(e -> {
       e.bind(types[0], Long.class);
       e.bind(types[1], float.class);
     }, getType(LinkedHashMap.class));
-    assertEquals(p(LinkedHashMap.class, Long.class, Float.class), resolved);
+    assertEquals(resolved, p(LinkedHashMap.class, Long.class, Float.class));
   }
 
-  @DataProvider
-  public static Object[][] resolveMyListData() throws Exception {
+  private static Object[][] resolveMyListData() throws Exception {
     return new Object[][]{
         {List.class.getMethod("add", Object.class).getGenericParameterTypes(), p(List.class, Integer.class)},
         {ArrayList.class.getMethod("add", Object.class).getGenericParameterTypes(), p(ArrayList.class, Integer.class)},
@@ -94,9 +95,10 @@ public class ResolveTest {
     };
   }
 
-  @Test(groups = {NORMAL}, dataProvider = "resolveMyListData")
+  @ParameterizedTest
+  @MethodSource("resolveMyListData")
   public void resolveMyList(Type[] types, Type bindType) {
     final Type resolved = evaluate(e -> e.bind(types[0], bindType), getType(MyList.class));
-    assertEquals(p(MyList.class, Integer.class), resolved);
+    assertEquals(resolved, p(MyList.class, Integer.class));
   }
 }

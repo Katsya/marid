@@ -25,15 +25,16 @@ import net.wimpi.modbus.ModbusCoupler;
 import net.wimpi.modbus.net.ModbusTCPListener;
 import net.wimpi.modbus.procimg.SimpleProcessImage;
 import net.wimpi.modbus.procimg.SimpleRegister;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.marid.io.IOSupplier;
 import org.marid.proto.impl.StdProtoBus;
 import org.marid.proto.impl.StdProtoBusProps;
 import org.marid.proto.impl.StdProtoRoot;
 import org.marid.proto.impl.io.StdProtoSocketIO;
 import org.marid.proto.io.ProtoIO;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
@@ -47,22 +48,22 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 import static java.net.InetAddress.getLocalHost;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.marid.logging.Log.log;
-import static org.marid.test.TestGroups.SLOW;
-import static org.testng.Assert.assertEquals;
 
 /**
  * @author Dmitry Ovchinnikov
  */
-public class ModbusTest {
+@Tag("slow")
+class ModbusTest {
 
   private static final SimpleProcessImage IMAGE = new SimpleProcessImage();
   private static final ModbusTCPListener LISTENER = new ModbusTCPListener(3);
 
   private static int port;
 
-  @BeforeClass(groups = {SLOW})
-  public static void init() throws Exception {
+  @BeforeAll
+  static void init() throws Exception {
     //System.setProperty("net.wimpi.modbus.debug", "true");
 
     IMAGE.addRegister(new SimpleRegister(6890));
@@ -92,13 +93,13 @@ public class ModbusTest {
     }
   }
 
-  @AfterClass(groups = {SLOW})
-  public static void stop() {
+  @AfterAll
+  static void stop() {
     LISTENER.stop();
   }
 
-  @Test(groups = {SLOW})
-  public void test() throws Exception {
+  @Test
+  void test() throws Exception {
     try (final StdProtoRoot root = new StdProtoRoot("root", "root")) {
       final StdProtoBusProps busProps = new StdProtoBusProps();
       final IOSupplier<ProtoIO> ioProvider = () -> new StdProtoSocketIO(new Socket(getLocalHost(), port));
@@ -117,8 +118,8 @@ public class ModbusTest {
       if (data == null) {
         throw new TimeoutException();
       }
-      assertEquals(data.length, 2);
-      assertEquals(ByteBuffer.wrap(data).asCharBuffer().charAt(0), 6890);
+      assertEquals(2, data.length);
+      assertEquals(6890, ByteBuffer.wrap(data).asCharBuffer().charAt(0));
     }
   }
 }

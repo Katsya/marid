@@ -10,6 +10,10 @@
 
   <artifactId>marid-webapp</artifactId>
 
+  <properties>
+    <license.licenseName>epl_v1</license.licenseName>
+  </properties>
+
   <dependencies>
     <!-- web -->
     <dependency>
@@ -19,68 +23,14 @@
     </dependency>
 
     <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin</artifactId>
+      <groupId>org.eclipse.rap</groupId>
+      <artifactId>org.eclipse.rap.rwt</artifactId>
+      <version>3.4.0</version>
     </dependency>
 
     <dependency>
       <groupId>com.vaadin</groupId>
-      <artifactId>flow-data</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>flow-push</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-dialog-flow</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-grid-flow</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-text-field-flow</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-notification-flow</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-tabs-flow</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-lumo-theme</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-icons-flow</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-form-layout-flow</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-ordered-layout-flow</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-checkbox-flow</artifactId>
+      <artifactId>vaadin-core</artifactId>
     </dependency>
 
     <dependency>
@@ -101,7 +51,6 @@
     </dependency>
 
     <!-- business -->
-
     <dependency>
       <groupId>org.marid</groupId>
       <artifactId>marid-runtime</artifactId>
@@ -145,8 +94,8 @@
       <dependency>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-bom</artifactId>
+        <version>10.0.1</version>
         <type>pom</type>
-        <version>10.0.0.rc2</version>
         <scope>import</scope>
       </dependency>
     </dependencies>
@@ -251,11 +200,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <repositories>
-    <repository>
-      <id>vaadin-prereleases</id>
-      <url>https://maven.vaadin.com/vaadin-prereleases</url>
-    </repository>
-  </repositories>
 </project>

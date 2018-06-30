@@ -94,6 +94,10 @@ public class MaridIcon {
     return img;
   }
 
+  public static BufferedImage getImage(int size, int r, int g, int b, int a) {
+    return getImage(size, new Color(r, g, b, a));
+  }
+
   public static ImageIcon getIcon(int size, Color color) {
     return new ImageIcon(getImage(size, color));
   }

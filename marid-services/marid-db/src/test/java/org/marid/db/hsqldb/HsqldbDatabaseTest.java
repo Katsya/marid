@@ -21,28 +21,31 @@
 
 package org.marid.db.hsqldb;
 
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.marid.db.dao.NumericWriter;
 import org.marid.db.data.DataRecord;
 import org.marid.db.data.DataRecordKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.Test;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.Instant;
 import java.util.*;
 
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.stream.Collectors.toSet;
-import static org.marid.test.TestGroups.SLOW;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * @author Dmitry Ovchinnikov.
  */
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {HsqldbDatabaseTestConf.class})
-public class HsqldbDatabaseTest extends AbstractTestNGSpringContextTests {
+@Tag("slow")
+class HsqldbDatabaseTest {
 
   private final long from = Instant.parse("2000-01-01T00:00:00Z").toEpochMilli();
   private final long to = Instant.parse("2000-01-01T00:10:00Z").toEpochMilli();
@@ -50,8 +53,8 @@ public class HsqldbDatabaseTest extends AbstractTestNGSpringContextTests {
   @Autowired
   private NumericWriter numericWriter;
 
-  @Test(groups = {SLOW})
-  public void test01() {
+  @Test
+  void test01() {
     final List<DataRecord<Double>> expected = new ArrayList<>();
     for (long t = from / 1000L; t < to / 1000L; t += 10L) {
       final Instant instant = Instant.ofEpochSecond(t);
@@ -60,18 +63,18 @@ public class HsqldbDatabaseTest extends AbstractTestNGSpringContextTests {
     }
     final Set<DataRecordKey> insertResult = numericWriter.merge(expected, true);
     assertEquals(
-        insertResult.stream().map(DataRecordKey::getTimestamp).collect(toSet()),
-        expected.stream().map(DataRecord::getTimestamp).collect(toSet())
+        expected.stream().map(DataRecord::getTimestamp).collect(toSet()),
+        insertResult.stream().map(DataRecordKey::getTimestamp).collect(toSet())
     );
     final List<DataRecord<Double>> actual = numericWriter.fetchRecords(new long[]{0L}, from, to);
-    assertEquals(actual, expected);
+    assertEquals(expected, actual);
     final long max = expected.stream().mapToLong(DataRecord::getTimestamp).max().orElse(0L);
     final List<DataRecord<Double>> actualMinus1 = numericWriter.fetchRecords(new long[]{0L}, from, max);
-    assertEquals(actualMinus1.size(), expected.size() - 1);
+    assertEquals(expected.size() - 1, actualMinus1.size());
   }
 
-  @Test(groups = {SLOW})
-  public void test02() {
+  @Test
+  void test02() {
     final long t1 = Instant.parse("2000-01-01T00:00:10Z").toEpochMilli();
     final long t2 = Instant.parse("2000-01-01T00:00:40Z").toEpochMilli();
     final long t3 = Instant.parse("2000-01-01T00:00:50Z").toEpochMilli();
@@ -86,29 +89,29 @@ public class HsqldbDatabaseTest extends AbstractTestNGSpringContextTests {
     assertEquals(numericWriter.fetchRecord(0, t3).getValue(), 3.3, 1e-3);
   }
 
-  @Test(groups = {SLOW})
-  public void test03() {
+  @Test
+  void test03() {
     final long tf = Instant.parse("2000-01-01T00:00:10Z").toEpochMilli();
     final long tt = Instant.parse("2000-01-01T00:00:40Z").toEpochMilli();
     assertEquals(3L, numericWriter.delete(tf, tt));
   }
 
-  @Test(groups = {SLOW})
-  public void test04() {
+  @Test
+  void test04() {
     assertEquals(57L, numericWriter.getRecordCount());
   }
 
-  @Test(groups = {SLOW})
-  public void test05() {
+  @Test
+  void test05() {
     final Map<Long, String> hashBefore = numericWriter.hash(from, to, false, "MD5");
     final long t = Instant.parse("2000-01-01T00:00:50Z").toEpochMilli();
     assertEquals(1L, numericWriter.delete(t, t + 1000L));
     final Map<Long, String> hashAfter = numericWriter.hash(from, to, false, "MD5");
-    assertNotEquals(hashBefore, hashAfter);
+    assertNotEquals(hashAfter, hashBefore);
   }
 
-  @Test(groups = {SLOW})
-  public void test06() {
+  @Test
+  void test06() {
     final List<DataRecord<Double>> expected = new ArrayList<>();
     for (long t = from / 1000L; t < to / 1000L; t += 10L) {
       final Instant instant = Instant.ofEpochSecond(t);
@@ -125,8 +128,8 @@ public class HsqldbDatabaseTest extends AbstractTestNGSpringContextTests {
     assertEquals(numericWriter.tagCount(from, to), 2);
   }
 
-  @Test(groups = {SLOW})
-  public void test07() {
+  @Test
+  void test07() {
     assertEquals(numericWriter.delete(from, from + DAYS.toMillis(1L)), 56L + 60L);
     assertEquals(numericWriter.fetchRecords(new long[]{0L, 1L}, from, to), Collections.emptyList());
     assertEquals(numericWriter.getRecordCount(), 0L);

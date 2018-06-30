@@ -4,18 +4,11 @@
  * %%
  * Copyright (C) 2012 - 2018 MARID software development group
  * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v. 1.0 which accompanies this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ * http://www.eclipse.org/org/documents/edl-v10.php.
  * #L%
  */
 package org.marid.ui.webide.base;
@@ -27,6 +20,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 @Component
 public class UserDirectories {
@@ -37,7 +31,12 @@ public class UserDirectories {
   private final Path artifactsFile;
 
   public UserDirectories(Directories directories, CommonProfile profile) throws IOException {
-    userDirectory = directories.getUsers().resolve(profile.getEmail());
+    final String name = Optional.ofNullable(profile.getEmail())
+        .filter(s -> !s.isEmpty())
+        .orElse(profile.getUsername());
+
+
+    userDirectory = directories.getUsers().resolve(name);
     projectsDirectory = userDirectory.resolve("projects");
     repositoriesDirectory = userDirectory.resolve("repositories");
     artifactsFile = userDirectory.resolve("artifacts.lst");

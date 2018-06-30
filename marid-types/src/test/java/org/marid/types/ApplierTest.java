@@ -21,12 +21,13 @@
 
 package org.marid.types;
 
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.marid.types.invokable.Invokable;
 import org.marid.types.invokable.InvokableConstructor;
 import org.marid.types.invokable.InvokableMethod;
 import org.springframework.ui.ModelMap;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -35,13 +36,12 @@ import java.util.concurrent.Callable;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static org.marid.test.TestGroups.SLOW;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.marid.types.AuxTypeUtils.p;
-import static org.testng.Assert.assertEquals;
 
-public class ApplierTest {
+@Tag("normal")
+class ApplierTest {
 
-  @DataProvider
   private static Object[][] applyTypeData() throws ReflectiveOperationException {
     return new Object[][] {
         {
@@ -92,10 +92,11 @@ public class ApplierTest {
     };
   }
 
-  @Test(groups = {SLOW}, dataProvider = "applyTypeData")
-  public void testType(Type expected, Invokable invokable, Class<?> type, Type target, int[] indices, Type[] args) {
+  @ParameterizedTest
+  @MethodSource("applyTypeData")
+  void testType(Type expected, Invokable invokable, Class<?> type, Type target, int[] indices, Type[] args) {
     final Method sam = Classes.getSam(type).orElseThrow(IllegalArgumentException::new);
     final Type actual = invokable.type(target, type, sam, indices, args);
-    assertEquals(actual, expected);
+    assertEquals(expected, actual);
   }
 }

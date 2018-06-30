@@ -43,7 +43,7 @@ public class Log {
       return index < 0 ? Logger.getLogger(name) : Logger.getLogger(name.substring(0, index));
     }
   };
-  private static final StackWalker WALKER = StackWalker.getInstance(RETAIN_CLASS_REFERENCE);
+  public static final StackWalker WALKER = StackWalker.getInstance(RETAIN_CLASS_REFERENCE);
 
   public static void log(@NotNull Level level, @NotNull String message, @Nullable Throwable thrown, Object... args) {
     log(LOGGERS.get(WALKER.getCallerClass()), level, message, thrown, args);
@@ -53,16 +53,20 @@ public class Log {
     log(LOGGERS.get(WALKER.getCallerClass()), level, message, args);
   }
 
-  public static void log(@NotNull Logger g, @NotNull Level l, @NotNull String m, @Nullable Throwable t, Object... p) {
-    final LogRecord record = new LogRecord(l, m);
-    record.setLoggerName(g.getName());
-    record.setSourceClassName(null);
-    record.setThrown(t);
-    record.setParameters(p);
-    g.log(record);
-  }
-
   public static void log(@NotNull Logger logger, @NotNull Level level, @NotNull String message, Object... args) {
     log(logger, level, message, null, args);
+  }
+
+  public static void log(@NotNull Logger logger,
+                         @NotNull Level level,
+                         @NotNull String message,
+                         @Nullable Throwable thrown,
+                         Object... args) {
+    final LogRecord record = new LogRecord(level, message);
+    record.setLoggerName(logger.getName());
+    record.setSourceClassName(null);
+    record.setThrown(thrown);
+    record.setParameters(args);
+    logger.log(record);
   }
 }

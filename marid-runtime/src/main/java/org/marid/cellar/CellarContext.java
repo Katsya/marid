@@ -85,7 +85,7 @@ public class CellarContext {
   public Runnable destroyer(@NotNull Bottle bottle,
                             @NotNull RackContext context,
                             @Nullable Object instance) {
-    final Runnable[] destroyers = Stream.of(this.destroyers)
+    final var destroyers = Stream.of(this.destroyers)
         .map(d -> d.destroyer(bottle, context, instance))
         .filter(Objects::nonNull)
         .toArray(Runnable[]::new);

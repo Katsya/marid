@@ -116,12 +116,10 @@ public interface Invokable {
       }
       return params;
     };
-    return Proxy.newProxyInstance(loader, new Class<?>[]{type}, (p, m, a) -> {
-      if (sam.equals(m)) {
-        return sam.invoke(target, paramsFunc.apply(a));
-      } else {
-        return null;
-      }
-    });
+    return Proxy.newProxyInstance(
+        loader,
+        new Class<?>[]{type},
+        (p, m, a) -> sam.equals(m) ? sam.invoke(target, paramsFunc.apply(a)) : null
+    );
   }
 }

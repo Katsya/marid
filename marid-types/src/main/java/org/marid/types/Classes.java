@@ -24,13 +24,13 @@ package org.marid.types;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import static java.util.stream.Stream.concat;
 
 /**
  * Utilities for classes.
@@ -47,62 +47,34 @@ public interface Classes {
    */
   @NotNull
   static Stream<Class<?>> classes(@NotNull Class<?> type) {
-    return classes(type, true, false);
+    return classes(type, false);
   }
 
   /**
    * Enumerates classes from the given type (including the argument itself).
    *
-   * @param type       type to enumerate from
-   * @param accessible whether the accessibility check is performed on each class or not
-   * @param array      whether take in account an array type hierarchy or not
+   * @param type  type to enumerate from
+   * @param array whether take in account an array type hierarchy or not
    * @return all subclasses (classes and interfaces).
    */
   @NotNull
-  static Stream<Class<?>> classes(@NotNull Class<?> type, boolean accessible, boolean array) {
-    final LinkedHashSet<Class<?>> set = new LinkedHashSet<>();
-    addClasses(type, set, accessible, array);
-    return set.stream();
+  static Stream<Class<?>> classes(@NotNull Class<?> type, boolean array) {
+    return classes(type, Stream.empty(), array).distinct();
   }
 
-  private static void addClasses(Class<?> type, LinkedHashSet<Class<?>> classes, boolean accessible, boolean array) {
+  private static Stream<Class<?>> classes(Class<?> type, Stream<Class<?>> classes, boolean array) {
+    for (Class<?> c = type; c != null; c = c.getSuperclass()) {
+      classes = concat(classes, Stream.of(c));
+    }
+    for (Class<?> c = type; c != null; c = c.getSuperclass()) {
+      for (final Class<?> i : c.getInterfaces()) {
+        classes = classes(i, classes, array);
+      }
+    }
     if (array && type.isArray()) {
-      classes(type.getComponentType(), accessible, true).forEach(c -> classes.add(Array.newInstance(c, 0).getClass()));
+      classes = concat(classes, classes(type.getComponentType(), true).map(c -> Array.newInstance(c, 0).getClass()));
     }
-    if (type.isInterface()) {
-      if (!accessible || isAccessible(type)) {
-        classes.add(type);
-      }
-      for (final Class<?> i : type.getInterfaces()) {
-        addClasses(i, classes, accessible, array);
-      }
-    } else {
-      for (Class<?> c = type; c != null; c = c.getSuperclass()) {
-        if (!accessible || isAccessible(c)) {
-          classes.add(c);
-        }
-      }
-      for (Class<?> c = type; c != null; c = c.getSuperclass()) {
-        for (final Class<?> i : c.getInterfaces()) {
-          addClasses(i, classes, accessible, array);
-        }
-      }
-    }
-  }
-
-  /**
-   * Checks whether the given type is accessible or not.
-   *
-   * @param type A type.
-   * @return Accessible flag.
-   */
-  static boolean isAccessible(@NotNull Class<?> type) {
-    try {
-      MethodHandles.publicLookup().accessClass(type);
-      return true;
-    } catch (IllegalAccessException | SecurityException x) {
-      return false;
-    }
+    return classes;
   }
 
   /**

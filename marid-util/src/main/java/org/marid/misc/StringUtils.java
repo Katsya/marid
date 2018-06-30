@@ -21,8 +21,11 @@
 
 package org.marid.misc;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import org.jetbrains.annotations.NotNull;
+import org.marid.logging.Log;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -66,5 +69,24 @@ public interface StringUtils {
     final var format = NumberFormat.getNumberInstance(locale);
     format.setMaximumFractionDigits(precision);
     return format.format(value) + suffices[index];
+  }
+
+  static String stripBrackets(@NotNull String value) {
+    if (value.startsWith("[") && value.endsWith("]")) {
+      return value.substring(1, value.length() - 1);
+    } else {
+      return value;
+    }
+  }
+
+  static String resource(String file) {
+    final var caller =  Log.WALKER.getCallerClass();
+    try (final var stream = caller.getResourceAsStream(file)) {
+      final var out = new ByteArrayOutputStream();
+      stream.transferTo(out);
+      return out.toString(StandardCharsets.UTF_8);
+    } catch (IOException x) {
+      throw new UncheckedIOException(x);
+    }
   }
 }

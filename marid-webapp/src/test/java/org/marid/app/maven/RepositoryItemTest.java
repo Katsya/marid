@@ -4,18 +4,11 @@
  * %%
  * Copyright (C) 2012 - 2018 MARID software development group
  * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v. 1.0 which accompanies this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ * http://www.eclipse.org/org/documents/edl-v10.php.
  * #L%
  */
 
@@ -32,9 +25,12 @@ import org.apache.ivy.core.retrieve.RetrieveOptions;
 import org.apache.ivy.core.retrieve.RetrieveReport;
 import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.plugins.resolver.IBiblioResolver;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.marid.app.ivy.IvyCommonConfiguration;
 import org.marid.app.ivy.IvySlfLoggerAdapter;
-import org.marid.applib.spring.LoggingPostProcessor;
+import org.marid.spring.LoggingPostProcessor;
 import org.marid.test.FileHolder;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,23 +38,22 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.Test;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import static org.marid.test.TestGroups.MANUAL;
-
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration
-public class RepositoryItemTest extends AbstractTestNGSpringContextTests {
+@Tag("manual")
+public class RepositoryItemTest {
 
   @Autowired
   private Ivy ivy;
 
-  @Test(groups = {MANUAL})
-  public void testResolve() throws Exception {
+  @Test
+  void testResolve() throws Exception {
     final ResolveOptions resolveOptions = new ResolveOptions();
     resolveOptions.setTransitive(true);
     resolveOptions.setDownload(true);
